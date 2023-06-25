@@ -6,7 +6,7 @@ Spotify API Flask App: This component interacts with the Spotify API to authenti
 
 Apple Music Script: The Apple Music Playlist Automation Script utilizes the Selenium framework for web browser automation to seamlessly add songs from the track_data JSON file to a new playlist on Apple Music. 
 
-Script Runner: Runs the Spotify API Flask app, waits for the JSON file containing the track data, executes the Apple Music script to add the tracks to a new playlist, terminates the Flask app subprocess, and deletes the JSON file.
+Main Script Driver: Runs the Spotify API Flask app, waits for the JSON file containing the track data, executes the Apple Music script to add the tracks to a new playlist, terminates the Flask app subprocess, and deletes the JSON file.
 
 How the program works:
 
