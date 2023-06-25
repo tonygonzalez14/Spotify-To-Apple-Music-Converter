@@ -10,18 +10,16 @@ Main Script Driver: Runs the Spotify API Flask app, waits for the JSON file cont
 
 How the program works:
 
-1. The user provides their Spotify and Apple Music credentials, allowing the program to access their Spotify account.
+1. The program starts a Flask app that interacts with the Spotify API. The user is prompted to log in to their Spotify account and authorize the app.
 
-2. The program starts a Flask app that interacts with the Spotify API. The user is prompted to log in to their Spotify account and authorize the app.
+2. Once authorized, the Flask app retrieves the user-selected Spotify playlist's track information using the Spotify API. The track data, including the track name and artist, is stored in a JSON file.
 
-3. Once authorized, the Flask app retrieves the selected Spotify playlist's track information using the Spotify API. The track data, including the track name and artist, is stored in a JSON file.
+3. The program then uses the Selenium framework to automate web browser interaction. It opens the Apple Music web interface in a browser window.
 
-4. The program then uses the Selenium framework to automate web browser interaction. It opens the Apple Music web interface in a browser window.
+4. The user provides their Apple Music credentials, allowing the program to access their Apple Music account.
 
-5. The user provides their Apple Music credentials, allowing the program to access their Apple Music account.
+5. Using the obtained track data from the Spotify API, the program searches for each track on the Apple Music web interface using browser automation.
 
-6. Using the obtained track data from the Spotify API, the program searches for each track on the Apple Music web interface using browser automation.
-
-7. When an identical track is found on Apple Music, the program adds it to a new playlist on the user's Apple Music account using the browser automation capabilities.
+6. When an identical track is found on Apple Music, the program adds it to a new playlist on the user's Apple Music account using the browser automation capabilities.
 
 Once all the tracks are added, the playlist conversion process is complete.
