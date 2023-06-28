@@ -6,12 +6,12 @@ import json
 
 app = Flask(__name__)
 
-app.secret_key = "private"
+app.secret_key = "JAISJd1238nfMA"
 app.config["SESSION_COOKIE_NAME"] = "App Cookie"
 TOKEN_INFO = "token_info"
 
 # Prompt user to login to access user data
-@app.route('/')
+@app.route('/') 
 def login():
     sp_oauth = create_spotify_oauth()
     auth_url = sp_oauth.get_authorize_url()
@@ -20,8 +20,8 @@ def login():
 # Redirect after authentication success or failure
 @app.route('/redirect')
 def redirectPage():
-    sp_oauth = create_spotify_oauth()
     session.clear() # clears previous session data
+    sp_oauth = create_spotify_oauth()
     code = request.args.get("code")
     token_info = sp_oauth.get_access_token(code) # generates token
     session[TOKEN_INFO] = token_info
@@ -38,11 +38,20 @@ def getTracks():
 
     sp = spotipy.Spotify(auth=token_info["access_token"])
 
-    playlists = sp.current_user_playlists() # get user's public playlists
+    # Get user's playlists
+    playlists = []
+    offset = 0
+    while True:
+        response = sp.current_user_playlists(limit=50, offset=offset)
+        items = response["items"]
+        playlists.extend(items)
+        offset += len(items)
+        if not response["next"]:
+            break
 
     # Iterate over the playlists and retrieve information
-    playlist_list = [] # list with playlists
-    for playlist in playlists["items"]:
+    playlist_list = []  # list with playlists
+    for playlist in playlists:
         playlist_name = playlist["name"]
         playlist_id = playlist["id"]
         playlist_list.append({"name": playlist_name, "id": playlist_id})
@@ -52,16 +61,25 @@ def getTracks():
         print(f"{index+1}\t{playlist['name']}")
 
     selection = int(input("Enter the number of the playlist you would like to convert: "))
-    
-    # Retrieve tracks within the selected playlist
-    tracks = sp.playlist_tracks(playlist_list[selection-1]["id"])
 
-    track_list = [] # list with song name and artist
+    # Retrieve tracks within the selected playlist
+    playlist_id = playlist_list[selection-1]["id"]
+    tracks = []
+    offset = 0
+    while True:
+        response = sp.playlist_tracks(playlist_id, offset=offset)
+        items = response["items"]
+        tracks.extend(items)
+        offset += len(items)
+        if not response["next"]:
+            break
+
     # Iterate over the tracks and retrieve information
-    for item in tracks["items"]:
+    track_list = []  # list with song names and artists
+    for item in tracks:
         track = item["track"]
         track_name = track["name"]
-        track_artist = track['artists'][0]['name']
+        track_artist = track["artists"][0]["name"]
         track_list.append({"name": track_name, "artist": track_artist})
 
     # Open a file for writing
@@ -86,7 +104,7 @@ def get_token():
 # OAuth object for API access
 def create_spotify_oauth():
     return SpotifyOAuth(
-        client_id= "private",
-        client_secret= "private",
+        client_id= "ecf863c62fd947c2aa1e7a8b72610285",
+        client_secret= "ea7f27e6d1924babac722786aa092ffa",
         redirect_uri=url_for("redirectPage", _external=True),
-        scope= "user-library-read")
+        scope= "user-library-read playlist-read-private playlist-read-collaborative")
