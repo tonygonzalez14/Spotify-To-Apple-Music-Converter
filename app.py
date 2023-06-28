@@ -6,7 +6,7 @@ import json
 
 app = Flask(__name__)
 
-app.secret_key = "JAISJd1238nfMA"
+app.secret_key = "censored"
 app.config["SESSION_COOKIE_NAME"] = "App Cookie"
 TOKEN_INFO = "token_info"
 
@@ -104,7 +104,7 @@ def get_token():
 # OAuth object for API access
 def create_spotify_oauth():
     return SpotifyOAuth(
-        client_id= "ecf863c62fd947c2aa1e7a8b72610285",
-        client_secret= "ea7f27e6d1924babac722786aa092ffa",
+        client_id= "censored",
+        client_secret= "censored",
         redirect_uri=url_for("redirectPage", _external=True),
         scope= "user-library-read playlist-read-private playlist-read-collaborative")
