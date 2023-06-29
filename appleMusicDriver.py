@@ -11,6 +11,7 @@ import json
 
 # Iterates through track_data JSON file and adds all songs to new Apple Music Playlist
 def add_songs_to_playlist(driver, track_data, wait):
+    missed_songs = []
     search_field = driver.find_element(By.XPATH, "//*[@id='search-input-form']/input") # find search field
     # Search for songs and add to new playlist
     for track_info in track_data:
@@ -19,21 +20,32 @@ def add_songs_to_playlist(driver, track_data, wait):
         search_field.send_keys(track_info["name"] + " " + track_info["artist"], Keys.ENTER)
         time.sleep(0.5) # wait for new song to load
         
-        options_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//*[@id='scrollable-page']/main/div/div[3]/div[4]/div/div[2]/section/div[1]/ul/li[1]/div/div/div[2]/div/amp-contextual-menu-button/button")))
-        options_button.click() # open options nested box
-        
-        add_playlist_button = wait.until(EC.element_to_be_clickable((By.XPATH, "/html/body/amp-contextual-menu/div/div/ul/amp-contextual-menu-item[1]/li/button")))
-        add_playlist_button.click() # open playlists nested box
-        
-        current_playlist_button = wait.until(EC.element_to_be_clickable((By.XPATH, "/html/body/amp-contextual-menu/div/div/ul/amp-contextual-menu-item[1]/li/div/amp-contextual-menu/div/div/ul/amp-contextual-menu-item[2]/li")))
-        current_playlist_button.click() # add to playlist      
-        
-        print(f"{track_info['name']} by {track_info['artist']} added")
+        try:
+            options_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//*[@id='scrollable-page']/main/div/div[3]/div[4]/div/div[2]/section/div[1]/ul/li[1]/div/div/div[2]/div/amp-contextual-menu-button/button")))
+            options_button.click() # open options nested box
+            
+            add_playlist_button = wait.until(EC.element_to_be_clickable((By.XPATH, "/html/body/amp-contextual-menu/div/div/ul/amp-contextual-menu-item[1]/li/button")))
+            add_playlist_button.click() # open playlists nested box
+            
+            current_playlist_button = wait.until(EC.element_to_be_clickable((By.XPATH, "/html/body/amp-contextual-menu/div/div/ul/amp-contextual-menu-item[1]/li/div/amp-contextual-menu/div/div/ul/amp-contextual-menu-item[2]/li")))
+            current_playlist_button.click() # add to playlist      
+            
+            print(f"{track_info['name']} by {track_info['artist']} added")
+        except: # if song could not be found
+            print(f"{track_info['name']} by {track_info['artist']} not added")
+            missed_songs.append(f"{track_info['name']} by {track_info['artist']}") # add to missed songs list
+            
+    print("Conversion Complete")
+    if missed_songs: # print songs not converted
+        print("Songs not converted:", missed_songs)
 
 def main():
     # Keep website window open 
     options = Options()
-    options.add_experimental_option("detach", True)
+    options.add_experimental_option("detach", False)
+
+    # Open existing user's Chrome browser
+    options.add_argument("--user-data-dir=C:\\Users\\tonyg\\AppData\\Local\\Google\\Chrome\\User Data")
 
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()),
                             options=options)
@@ -42,12 +54,8 @@ def main():
     driver.get("https://music.apple.com/us/listen-now?l=en-US")
     driver.maximize_window()
 
-    # Wait until site loads, locate and click sign in button using XPath
+    # Wait until site loads, if already signed in, begin conversion, else, have user log in
     wait = WebDriverWait(driver, timeout=3600)
-    button = wait.until(EC.element_to_be_clickable((By.XPATH, "//*[@id='scrollable-page']/div/div/amp-chrome-player/div[2]/div[2]/button")))
-    button.click()
-
-    # Wait until user logs into account
     login_success = wait.until(EC.element_to_be_clickable((By.XPATH, "//*[@id='navigation']/div[3]/div[3]/ul/li[1]/a")))
     if login_success:
         print("Login successful...")
@@ -57,9 +65,8 @@ def main():
     with open('track_data.json', 'r') as file:
         track_data = json.load(file)
     
+    wait = WebDriverWait(driver, timeout=3)
     add_songs_to_playlist(driver, track_data, wait) # add songs to playlist
-
-    print("Conversion Complete")
     
 if __name__ == "__main__":
     main()
