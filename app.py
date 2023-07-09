@@ -108,3 +108,6 @@ def create_spotify_oauth():
         client_secret= "censored",
         redirect_uri=url_for("redirectPage", _external=True),
         scope= "user-library-read playlist-read-private playlist-read-collaborative")
+
+if __name__ == "__main__":
+    app.run(debug=True)
