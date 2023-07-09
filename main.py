@@ -3,7 +3,7 @@ import os
 import time
 
 # Run the Spotify API Flask app
-flask_app_process = subprocess.Popen(['flask', 'run'])
+subprocess.run(['python', 'app.py'])
 
 # Wait for the JSON file to be created
 json_file_path = 'C:\\Users\\tonyg\\OneDrive\\Desktop\\Playlist Creator Project\\track_data.json'
@@ -11,11 +11,15 @@ json_file_path = 'C:\\Users\\tonyg\\OneDrive\\Desktop\\Playlist Creator Project\
 while not os.path.exists(json_file_path):
     time.sleep(1) # wait for 1 second before checking again
 
-# Run the Apple Music script
-subprocess.run(['python', 'appleMusicRunner.py'])
-
-# Terminate the Flask app subprocess
+# Terminate the Flask app subprocess and close the current browser window
 flask_app_process.terminate()
+os.system("taskkill /im chrome.exe /f")
+
+# Run the Apple Music script
+subprocess.run(['python', 'apple_music_driver.py'])
+
+# Run the Music Recommender script
+subprocess.run(['python', 'new_music_recommender.py'])
 
 # Delete the JSON file
 if os.path.exists(json_file_path):
